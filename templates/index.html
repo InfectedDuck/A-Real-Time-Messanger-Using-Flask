@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Welcome to Chat App</h1>
+    <form method="POST" action="{{ url_for('home') }}">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="code">Room Code:</label>
+            <input type="text" id="code" name="code" class="form-control">
+        </div>
+        <button type="submit" name="create" class="btn btn-primary">Create Room</button>
+        <button type="submit" name="join" class="btn btn-secondary">Join Room</button>
+    </form>
+    <br>
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+{% endblock %}

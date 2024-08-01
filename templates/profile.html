@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Profile</h1>
+    <div class="profile-header">
+        <img src="{{ user.profile_photo if user.profile_photo else url_for('static', filename='images/default.png') }}" alt="Profile Photo" class="img-thumbnail" width="150" height="150">
+        <div>
+            <h2>{{ user.username }}</h2>
+            <p>Email: {{ user.email }}</p>
+        </div>
+    </div>
+
+    <!-- Inline Bio Editing -->
+    <div class="inline-edit-section mt-3">
+        <h2>Bio</h2>
+        <div id="bio-container">
+            <p id="bio-text">{{ user.bio }}</p>
+            <button class="btn btn-primary" onclick="editBio()">Edit Bio</button>
+        </div>
+        <div id="bio-edit-form" class="form-container" style="display: none;">
+            <textarea id="bio-input" class="form-control">{{ user.bio }}</textarea>
+            <button class="btn btn-primary mt-2" onclick="updateBio()">Update Bio</button>
+            <button class="btn btn-secondary mt-2" onclick="cancelBioEdit()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Inline Contacts Editing -->
+    <div class="inline-edit-section mt-3">
+        <h2>Contacts</h2>
+        <div id="contacts-container">
+            <p>Phone: <span id="phone-text">{{ user.phone }}</span></p>
+            <p>Address: <span id="address-text">{{ user.address }}</span></p>
+            <button class="btn btn-primary" onclick="editContacts()">Edit Contacts</button>
+        </div>
+        <div id="contacts-edit-form" class="form-container" style="display: none;">
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone-input" class="form-control" value="{{ user.phone }}">
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" id="address-input" class="form-control" value="{{ user.address }}">
+            </div>
+            <button class="btn btn-primary mt-2" onclick="updateContacts()">Update Contacts</button>
+            <button class="btn btn-secondary mt-2" onclick="cancelContactsEdit()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Buttons to show/hide forms -->
+    <button class="btn btn-secondary mt-3" onclick="toggleForm('username-form')">Change Username</button>
+    <button class="btn btn-secondary mt-3" onclick="toggleForm('email-form')">Change Email</button>
+    <button class="btn btn-secondary mt-3" onclick="toggleForm('password-form')">Change Password</button>
+
+    <!-- Username Change Form -->
+    <div id="username-form" class="form-container" style="display: none;">
+        <h2>Change Username</h2>
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label for="new_username">Current Username:</label>
+                <input type="text" id="current_username" name="current_username" value="{{ user.username }}" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="new_username">New Username:</label>
+                <input type="text" id="new_username" name="new_username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="current_password">Current Password:</label>
+                <input type="password" id="current_password" name="current_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="repeat_password">Repeat Current Password:</label>
+                <input type="password" id="repeat_current_password" name="repeat_current_password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Username</button>
+        </form>
+    </div>
+
+    <!-- Email Change Form -->
+    <div id="email-form" class="form-container" style="display: none;">
+        <h2>Change Email</h2>
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label for="current_email">Current Email:</label>
+                <input type="email" id="current_email" name="current_email" value="{{ user.email }}" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="new_email">New Email:</label>
+                <input type="email" id="new_email" name="new_email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="current_password">Current Password:</label>
+                <input type="password" id="current_password" name="current_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="repeat_password">Repeat Current Password:</label>
+                <input type="password" id="repeat_current_password" name="repeat_current_password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Email</button>
+        </form>
+    </div>
+
+    <!-- Password Change Form -->
+    <div id="password-form" class="form-container" style="display: none;">
+        <h2>Change Password</h2>
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label for="current_password">Current Password:</label>
+                <input type="password" id="current_password" name="current_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">New Password:</label>
+                <input type="password" id="new_password" name="new_password" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="repeat_password">Repeat New Password:</label>
+                <input type="password" id="repeat_password" name="repeat_password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+    </div>
+
+    <!-- Photo Upload Form -->
+    <form method="POST" action="{{ url_for('upload_photo') }}" enctype="multipart/form-data" class="mt-3">
+        <div class="form-group">
+            <label for="photo">Upload New Profile Photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*" class="form-control-file">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Photo</button>
+    </form>
+
+    <a href="{{ url_for('logout') }}" class="btn btn-secondary mt-3">Logout</a>
+
+    <script>
+        function toggleForm(formId) {
+            const forms = document.querySelectorAll('.form-container');
+            forms.forEach(form => {
+                if (form.id === formId) {
+                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                } else {
+                    form.style.display = 'none';
+                }
+            });
+        }
+
+        function editBio() {
+            document.getElementById('bio-container').style.display = 'none';
+            document.getElementById('bio-edit-form').style.display = 'block';
+        }
+
+        function updateBio() {
+            const bio = document.getElementById('bio-input').value;
+            fetch('{{ url_for('update_bio') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ bio: bio })
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById('bio-text').innerText = bio;
+                    cancelBioEdit();
+                } else {
+                    alert('Failed to update bio');
+                }
+            });
+        }
+
+        function cancelBioEdit() {
+            document.getElementById('bio-container').style.display = 'block';
+            document.getElementById('bio-edit-form').style.display = 'none';
+        }
+
+        function editContacts() {
+            document.getElementById('contacts-container').style.display = 'none';
+            document.getElementById('contacts-edit-form').style.display = 'block';
+        }
+
+        function updateContacts() {
+            const phone = document.getElementById('phone-input').value;
+            const address = document.getElementById('address-input').value;
+            fetch('{{ url_for('update_contacts') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ phone: phone, address: address })
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById('phone-text').innerText = phone;
+                    document.getElementById('address-text').innerText = address;
+                    cancelContactsEdit();
+                } else {
+                    alert('Failed to update contacts');
+                }
+            });
+        }
+
+        function cancelContactsEdit() {
+            document.getElementById('contacts-container').style.display = 'block';
+            document.getElementById('contacts-edit-form').style.display = 'none';
+        }
+    </script>
+{% endblock %}

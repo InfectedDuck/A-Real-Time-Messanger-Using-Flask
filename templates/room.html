@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Room: {{ code }}</h1>
+    <div id="messages" class="border p-3" style="max-height: 400px; overflow-y: scroll;">
+        {% for message in messages %}
+        <div>
+            <strong>{{ message.name }}</strong>: {{ message.message }} ({{ message.timestamp }})
+        </div>
+        {% endfor %}
+    </div>
+
+    <form id="send-message" class="mt-3">
+        <div class="form-group">
+            <input type="text" id="message" placeholder="Type your message here..." class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+
+    <script>
+        var socket = io.connect('https://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            socket.emit('join', {room: "{{ code }}"});
+        });
+
+        socket.on('message', function(data) {
+            var messageContainer = document.getElementById('messages');
+            var messageElement = document.createElement('div');
+            messageElement.textContent = data.name + ': ' + data.message + ' (' + data.timestamp + ')';
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        });
+
+        document.getElementById('send-message').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var messageInput = document.getElementById('message');
+            socket.send({message: messageInput.value});
+            messageInput.value = '';
+        });
+    </script>
+{% endblock %}
