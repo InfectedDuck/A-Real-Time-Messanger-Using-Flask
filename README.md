@@ -1,1 +1,1 @@
-A real time messanger using a flask websockets, not ended
+A real time messanger using a flask websockets, uses database and routes to create different rooms for different users and also other features like searching user by name, texting them, etc. not ended
