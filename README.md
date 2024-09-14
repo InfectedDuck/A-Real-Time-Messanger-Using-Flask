@@ -67,4 +67,4 @@ The chat application is now **live** and secured via **HTTPS**!
 
 ## License
 
-This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE.txt](LICENSE.txt) file for details.
+This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE](LICENSE.txt) file for details.
