@@ -64,3 +64,7 @@ The chat application is now **live** and secured via **HTTPS**!
 - Implementing enhanced security features for password recovery.
 - Adding more room management features (e.g., private rooms, room moderation).
 - Implementing message history retrieval from the database.
+
+## License
+
+This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE.txt](LICENSE.txt) file for details.
